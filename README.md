@@ -26,10 +26,21 @@ Este proyecto implementa y compara dos algoritmos metaheurísticos de optimizaci
 
 ## Ejecución del Experimento
 
-Para correr la sintonización de parámetros y generar los resultados:
-```bash
-python main.py
-```
+El proyecto está diseñado para ejecutarse en dos fases distintas mediante argumentos de línea de comandos, garantizando el rigor metodológico de la comparación:
+
+**Fase 1: Sintonización de Parámetros (Llenado de Tabla 2)**
+Explora el espacio de hiperparámetros mediante múltiples ejecuciones independientes para encontrar las mejores configuraciones para TVAC-PSO y DE.
+
+    python main.py --phase tune
+
+*Salida esperada:* Archivos CSV en `results/csv_summaries/` con los mejores valores encontrados.
+
+**Fase 2: Comparación y Análisis Dinámico**
+Ejecuta ambos algoritmos utilizando únicamente los parámetros óptimos encontrados en la Fase 1, recolectando la telemetría detallada por iteración para el análisis visual.
+
+    python main.py --phase compare
+
+*Salida esperada:* Archivos JSON en `results/json_history/` y renderizado de las gráficas de convergencia, dispersión de población (cajas y bigotes) y radio poblacional.
 
 ## Estructura de Salida
 Los resultados se depositan en el directorio `results/`:
