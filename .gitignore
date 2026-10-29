@@ -1,0 +1,18 @@
+# Entornos virtuales
+venv/
+env/
+.env
+
+# Caché de Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Archivos de resultados locales
+results/json_history/*.json
+results/csv_summaries/*.csv
+
+# Archivos del sistema operativo (especialmente útil en MacOS/Windows)
+.DS_Store
+Thumbs.db
