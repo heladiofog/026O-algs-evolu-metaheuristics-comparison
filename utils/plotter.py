@@ -1,6 +1,7 @@
 import os
 import json
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -19,49 +20,75 @@ class Plotter:
             return json.load(f)
 
     def plot_convergence(self, de_data: dict, pso_data: dict):
-        """Genera las gráficas (a) mejor histórico y (b) mejor de iteración."""
-        plt.figure(figsize=(10, 6))
+        """Genera las gráficas separadas: (a) histórico y (b) iteración."""
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 10), sharex=True)
         
-        plt.plot(de_data["history"]["best_historical_fitness"], label="DE Mejor Histórico (a)", color="blue", linestyle="-")
-        plt.plot(de_data["history"]["best_iter_fitness"], label="DE Mejor Población (b)", color="lightblue", linestyle="--")
+        # Gráfica (a): Mejor solución histórica f(x*)
+        ax1.plot(pso_data["history"]["best_historical_fitness"], label="PSO", color="#1f77b4", linestyle="-")
+        ax1.plot(de_data["history"]["best_historical_fitness"], label="DE", color="#ff7f0e", linestyle="-")
+        ax1.set_title("(a) Mejor solución encontrada hasta el momento f(x*)")
+        ax1.set_ylabel("Valor de la Función")
+        ax1.legend()
         
-        plt.plot(pso_data["history"]["best_historical_fitness"], label="PSO Mejor Histórico (a)", color="red", linestyle="-")
-        plt.plot(pso_data["history"]["best_iter_fitness"], label="PSO Mejor Población (b)", color="salmon", linestyle="--")
+        # Gráfica (b): Mejor solución en la población por iteración f(x+)
+        ax2.plot(pso_data["history"]["best_iter_fitness"], label="PSO", color="#1f77b4", linestyle="--")
+        ax2.plot(de_data["history"]["best_iter_fitness"], label="DE", color="#ff7f0e", linestyle="--")
+        ax2.set_title("(b) Mejor solución en la población por iteración f(x+)")
+        ax2.set_xlabel("Iteración (t)")
+        ax2.set_ylabel("Valor de la Función")
+        ax2.legend()
         
-        plt.title("Convergencia: Función de Ackley 3D")
-        plt.xlabel("Iteración")
-        plt.ylabel("Valor de la Función Objetivo")
-        plt.legend()
+        plt.tight_layout()
         plt.savefig(os.path.join(self.plots_dir, "grafica_a_b_convergencia.png"))
         plt.close()
 
     def plot_population_radius(self, de_data: dict, pso_data: dict):
         """Genera la gráfica (d) del radio poblacional ζ."""
-        plt.figure(figsize=(10, 6))
-        plt.plot(de_data["history"]["population_radius"], label="DE", color="blue")
-        plt.plot(pso_data["history"]["population_radius"], label="PSO", color="red")
+        plt.figure(figsize=(10, 5))
+        plt.plot(pso_data["history"]["population_radius"], label="PSO", color="#1f77b4")
+        plt.plot(de_data["history"]["population_radius"], label="DE", color="#ff7f0e")
         
-        plt.title("Radio Poblacional (ζ) por Iteración")
-        plt.xlabel("Iteración")
+        plt.title("(d) Radio Poblacional (ζ) por Iteración")
+        plt.xlabel("Iteración (t)")
         plt.ylabel("Norma Euclidiana (ζ)")
         plt.legend()
+        plt.tight_layout()
         plt.savefig(os.path.join(self.plots_dir, "grafica_d_radio_poblacional.png"))
         plt.close()
 
     def plot_boxplots(self, data: dict, algo_name: str):
-        """Genera la gráfica (c) de caja y bigotes para la dispersión poblacional."""
+        """Genera la gráfica (c) de caja y bigotes agrupando 3 dimensiones por iteración."""
         positions = np.array(data["history"]["population_positions"])
-        iters, pop, dims = positions.shape
+        iters, pop_size, dims = positions.shape
         
-        fig, axes = plt.subplots(dims, 1, figsize=(12, 8), sharex=True)
-        fig.suptitle(f"Dispersión de Población por Dimensión - {algo_name}")
+        # Aplanar los datos para Seaborn
+        records = []
+        for t in range(iters):
+            for d in range(dims):
+                for i in range(pop_size):
+                    records.append({
+                        "Iteración": t,
+                        "Dimensión": f"Dim {d+1}",
+                        "Valor": positions[t, i, d]
+                    })
         
-        for d in range(dims):
-            dim_data = [positions[i, :, d] for i in range(iters)]
-            sns.boxplot(data=dim_data, ax=axes[d], fliersize=3, palette="Set2")
-            axes[d].set_ylabel(f"Dim {d+1}")
-            
-        axes[-1].set_xlabel("Iteración")
+        df = pd.DataFrame(records)
+        
+        plt.figure(figsize=(16, 6))
+        sns.boxplot(
+            data=df, 
+            x="Iteración", 
+            y="Valor", 
+            hue="Dimensión", 
+            fliersize=2, 
+            linewidth=0.8,
+            palette="Set2"
+        )
+        
+        plt.title(f"(c) Dispersión de la Población - {algo_name}")
+        plt.xlabel("Iteración (t)")
+        plt.ylabel("Valor en el dominio [-10, 10]")
+        plt.legend(title="Dimensiones")
         plt.tight_layout()
         plt.savefig(os.path.join(self.plots_dir, f"grafica_c_cajas_{algo_name}.png"))
         plt.close()
