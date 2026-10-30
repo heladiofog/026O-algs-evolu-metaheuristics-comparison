@@ -6,6 +6,7 @@ from core.parameter_tuner import ParameterTuner
 from algorithms.tvac_pso import TVAC_PSO
 from algorithms.de_current_to_best import DECurrentToBest
 from utils.data_exporter import DataExporter
+from utils.plotter import Plotter
 
 # Configuraciones globales del experimento dictadas por los requerimientos
 BOUNDS = (-10.0, 10.0)
@@ -77,6 +78,13 @@ def run_comparison():
     pso_telemetry = pso_algo.optimize()
     pso_json = exporter.export_telemetry_json(pso_telemetry, "telemetry_PSO.json")
     print(f"Telemetría de PSO guardada en: {pso_json}")
+
+    # 4. Generar gráficas
+    print("Renderizando gráficas comparativas...")
+    plotter = Plotter()
+    plotter.generate_all()
+    print(f"Gráficas guardadas exitosamente en: {plotter.plots_dir}")
+    
     print("Fase 2 completada. JSONs listos para renderizar gráficas.")
 
 if __name__ == "__main__":
