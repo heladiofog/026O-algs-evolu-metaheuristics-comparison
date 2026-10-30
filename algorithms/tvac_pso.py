@@ -73,7 +73,7 @@ class TVAC_PSO(MetaheuristicBase):
             self.history["population_radius"].append(self._calculate_population_radius(positions))
             
             # (Opcional) Almacenar las 30x3 posiciones si se requiere para la gráfica de caja y bigotes
-            # self.history["population_positions"].append(positions.tolist())
+            self.history["population_positions"].append(positions.tolist())
 
         return {
             "best_position": gbest_position.tolist(),

@@ -1,6 +1,6 @@
 import numpy as np
 import itertools
-from typing import List, Dict, Any, Type
+from typing import List, Dict, Any, Type, Tuple
 from core.metaheuristic_base import MetaheuristicBase
 
 class ParameterTuner:

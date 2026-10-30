@@ -74,7 +74,7 @@ class DECurrentToBest(MetaheuristicBase):
             self.history["population_radius"].append(self._calculate_population_radius(positions))
             
             # (Opcional) Guardar matriz 30x3 completa para el gráfico de caja y bigotes de la iteración final
-            # self.history["population_positions"].append(positions.tolist())
+            self.history["population_positions"].append(positions.tolist())
 
         return {
             "best_position": best_position.tolist(),
